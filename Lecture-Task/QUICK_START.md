@@ -81,7 +81,7 @@ The system automatically flags anomalies based on statistical thresholds:
 ---
 
 ## 📸 Screenshots
-*(GUI)*
+*(GUI.png)*
 
 ---
 
