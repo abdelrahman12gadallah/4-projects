@@ -1,79 +1,88 @@
---------------------------------------------------------------------------------
-# ⚡ GreenStream Energy - Serverless ETL Pipeline
+# ⚡ GreenStream Energy - ETL Dashboard & Pipeline
 
 ### 👤 Author: Abdelrahman Gadallah
-**Framework:** Data Science Design | **Date:** December 2024
+**Framework:** Data Science Design | **Built with:** Lovable & Python Logic
+**Status:** Live Prototype 🟢
 
 ---
 
 ## 📖 Project Overview
-**GreenStream Energy** is a scalable, serverless ETL architecture designed to ingest and process smart meter data at scale. The system handles **4.8 million daily readings** from **50,000+ smart meters**, converting raw CSV streams into analytical Parquet datasets [1].
+**GreenStream Energy** is a simulation dashboard and ETL pipeline designed to process high-velocity smart meter data. This project demonstrates a serverless architecture capable of handling **4.8 million daily readings** from **50,000+ smart meters** [1].
 
-Unlike standard pipelines, this project implements a **"Quality Scoring System"** that grades every data point (A-F) in real-time, ensuring that only high-quality data feeds the BI dashboards and ML models [2].
+Using a custom **Lovable** interface, this application visualizes the transformation journey of energy data—from raw CSV ingestion to analytical Parquet storage—highlighting real-time data quality scoring and fault detection [2].
 
 ---
 
-## 🏗️ System Architecture
+## 🔗 Live Demo
+> **[https://abdelrahmangadallah.lovable.app/]**  
+> *Click above to interact with the ETL dashboard and view real-time processing simulation.*
 
-The pipeline follows an event-driven flow ensuring low latency and high availability [1, 3, 4]:
+---
 
-| Layer | Component | Function & Details |
+## 🏗️ Architecture Design
+
+The system follows an event-driven flow ensuring low latency and high availability [2]:
+
+| Layer | Component | Function |
 | :--- | :--- | :--- |
-| **1. Ingestion** | **Smart Meters & S3** | Ingests CSV files via Wi-Fi into S3 Landing Zone (`/raw-data/YYYY-MM-DD/`). |
-| **2. Orchestration** | **Event Engine** | Triggered by `New File Creation`. Handles validation, routing, and duplicate detection. |
-| **3. Transformation** | **Serverless Workers** | Parses CSV, standardizes units, applies business rules, and calculates quality scores. |
-| **4. Storage (Ops)** | **RDS (Structured)** | Stores transactional data (`meter_readings`) with **90-day retention**. |
-| **5. Analytics** | **Data Lake (S3)** | Batch jobs convert data to **Snappy-compressed Parquet** (~70% size reduction) for long-term analysis. |
+| **Ingestion** | **S3 Landing Zone** | Ingests CSV files via Wi-Fi (`/raw-data/YYYY-MM-DD/`). |
+| **Processing** | **Serverless Worker** | Parses CSV, standardizes units (W → kW), and scores quality. |
+| **Storage** | **RDS (Structured)** | Stores transactional data with **90-day retention** [2]. |
+| **Analytics** | **Data Lake** | Batch jobs convert data to **Snappy-compressed Parquet** (~70% size reduction) [3]. |
 
 ---
 
-## ⚙️ Business Rules & Logic (The Core)
+## ⚙️ Key Features & Business Logic
 
-The pipeline enforces strict data governance through 6 categories of rules [2, 4-6]:
+This project implements strict data governance rules visualized in the dashboard:
 
-### 🔹 1. Unit Standardization
-*   **Logic:** If unit is "W" (Watts), divide by 1000 to get "kW".
-*   **Precision:** All values rounded to **4 decimal places** to prevent floating-point errors [7].
-*   **Guardrails:** Strict allow-list validation (rejects units like "Volts") [4].
+### 🔹 1. Unit Standardization (Auto-Fix)
+*   **Logic:** Detects "W" (Watts) and divides by 1000 to convert to "kW" [3].
+*   **Precision:** Rounds all values to **4 decimal places** [4].
+*   **Validation:** Rejects invalid units (e.g., "Volts") instantly.
 
-### 🔹 2. Advanced Fault Detection
-*   **Stuck Meter:** Flags variance $< 0.01 \text{ kW}^2$ over a 24-hour window [6].
-*   **Erratic Spikes:** Detects anomalies where Reading $> \text{Mean} + (4 \times \text{StdDev})$ [6].
-*   **Communication Gaps:** Alerts if missing rate $> 20\%$ over 7 days [2].
+### 🔹 2. The "Quality Score" System (A-F)
+A unique grading system assigns a score to every reading before storage [5]:
 
-### 🔹 3. The "Quality Score" System (Unique Feature)
-Every record starts with **0 points** and earns points based on quality checks. A grade is assigned before storage [2]:
-
-| Criteria | Points | Grade Scale |
+| Score Criteria | Points | Grade |
 | :--- | :--- | :--- |
-| No Missing Values | +40 | **A (90-100)** |
-| No Validation Errors | +30 | **B (75-89)** |
-| Within Physical Range | +20 | **C (60-74)** |
-| High Meter Reliability | +10 | **F (< 60)** |
+| **Completeness** | +40 | **A (90-100)** |
+| **Validation Pass** | +30 | **B (75-89)** |
+| **Physical Range** | +20 | **C (60-74)** |
+| **Meter Reliability**| +10 | **F (< 60)** |
+
+### 🔹 3. Advanced Fault Detection
+The system automatically flags anomalies based on statistical thresholds:
+*   **Stuck Meter:** Variance $< 0.01 \text{ kW}^2$ over 24h [6].
+*   **Erratic Spikes:** Reading $> \text{Mean} + (4 \times \text{StdDev})$ [6].
+*   **Zero Consumption:** 0 kW for >24 consecutive hours [7].
 
 ---
 
-## 🔄 Data Lineage: Single Record Journey
-*Scenario based on real processing logs [8-11]*
+## 🔄 Scenario: Single Record Journey
+*Ref: Task C - Traceability*
 
-1.  **Ingestion (18:45:00):** Meter `SM-48291` uploads a reading of `3250 W`.
-2.  **Trigger (18:45:03):** S3 Event triggers the Orchestrator.
-3.  **Transformation (18:45:04):**
-    *   **Conversion:** `3250 W` → **3.25 kW**.
-    *   **Enrichment:** Tagged as **PEAK** (17:00-21:00) and **SPRING** season.
-    *   **Scoring:** Passes all checks. **Score: 100/100 (Grade A)**.
-    *   **Idempotency:** Generates ID `SHA256(SM-48291 + Timestamp + 3250)`.
-4.  **Storage (18:45:05):** Committed to RDS `meter_readings` table.
-5.  **Archival (02:00 AM):** Aggregated into Data Lake (`/analytics/year=2024/`) in Parquet format.
+1.  **Ingestion:** Meter `SM-48291` sends `3250 W` at `18:45:00` [8].
+2.  **Transformation:**
+    *   Converts `3250 W` → **3.25 kW** [9].
+    *   Tags period as **PEAK** (17:00-21:00) [5].
+    *   Calculates Quality Score: **100/100 (Grade A)** [10].
+3.  **Storage:** Committed to DB with Idempotency Key `SHA256(...)` [10].
+4.  **Archival:** Aggregated into Data Lake for ML forecasting models [11].
 
 ---
 
-## 🛡️ Design Principles
-
-*   **Idempotency:** Uses SHA256 hashing to generate unique record IDs. Re-processing the same file results in `ON CONFLICT DO NOTHING`, preventing duplicates [8, 10].
-*   **Separation of Concerns:** Raw data (Audit), Structured DB (Operations), and Data Lake (Analytics) are decoupled [12].
-*   **Resiliency:** Implements **exponential backoff** (2s, 4s, 8s) for retries before moving failed events to a Dead Letter Queue (DLQ) [13].
+## 💻 Tech Stack
+*   **Frontend/UI:** Lovable.dev (React/Tailwind based)
+*   **Logic:** Python (Pandas equivalent logic)
+*   **Architecture Concepts:** Event-Driven, Serverless, Data Lakehouse
+*   **Data Formats:** CSV (Ingest), Parquet (Analytics)
 
 ---
 
-*Designed by **Abdelrahman Gadallah** - December 2024*
+## 📸 Screenshots
+*(Add screenshots from your Lovable dashboard here showing the "Creative Blue GUI" and data tables)*
+
+---
+
+*Designed & Implemented by **Abdelrahman Gadallah** - December 2024*
