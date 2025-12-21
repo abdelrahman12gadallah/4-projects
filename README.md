@@ -6,7 +6,7 @@
 ---
 
 ## 📖 Overview
-Welcome to my project portfolio. This repository contains a collection of data analysis, visualization, and engineering projects demonstrating end-to-end data solutions using **Python, SQL, Power BI, and Tableau**.
+Welcome to my project portfolio. This repository contains a collection of data analysis, visualization, and engineering projects demonstrating end-to-end data solutions using **Excel, SQL, Power BI, and Tableau**.
 
 ---
 
