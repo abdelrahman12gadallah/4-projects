@@ -43,7 +43,7 @@ This is a **serverless event-driven architecture** designed to handle high-veloc
 
 ## 📫 Contact
 *   **GitHub:** [abdelrahman12gadallah](https://github.com/abdelrahman12gadallah)
-*   **LinkedIn:** *(Add your LinkedIn URL here)*
+*   **LinkedIn:** *(https://www.linkedin.com/in/abdelrahman-gadallah-885753275/)*
 
 ---
 *Last Updated: December 2024*
