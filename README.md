@@ -16,7 +16,7 @@ Welcome to my project portfolio. This repository contains a collection of data a
 | :--- | :--- | :--- | :--- |
 | **[GreenStream Energy (Lecture Task)](./Lecture-Task)** | ⚡ Energy / ETL | Python, AWS, SQL | A serverless ETL pipeline processing 4.8M smart meter readings with real-time quality scoring (A-F) and fault detection. |
 | **[Adventure Works Sales](./Adventure-Works-2022-Sales-Dashboard-main)** | 📈 Sales | SQL / Excel | Comprehensive sales performance dashboard tracking KPIs, regional revenue, and product trends for Adventure Works. |
-| **[Bank Loan Report](./Bank-Loan-Report-Dashboard-main)** | 🏦 Finance | Power BI | Risk analysis dashboard visualizing loan approval rates, total funded amounts, and borrower profiles. |
+| **[Bank Loan Report](./Bank-Loan-Report-Dashboard-main)** | 🏦 Finance | Excel | Risk analysis dashboard visualizing loan approval rates, total funded amounts, and borrower profiles. |
 | **[Customer Analysis](./Customer-Analysis-using-Tableau-main)** | 👥 Marketing | Tableau | Customer segmentation and behavioral analysis to identify key demographics and purchasing patterns. |
 | **[LogiPro Supply Chain](./LogiPro-Supply-Chain-main)** | 🚚 Logistics | Power BI | Supply chain optimization project focusing on inventory management and delivery route efficiency. |
 
